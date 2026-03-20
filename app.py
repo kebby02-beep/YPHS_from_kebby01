@@ -99,6 +99,23 @@ col3.markdown(f"<div class='score-board'>場景: <span class='special'>{st.sessi
 st.markdown(f"**AI 提示**: {ai_prompt}")
 st.info(f"循環回合: {st.session_state.turn} | {st.session_state.status_msg}")
 
+# 更詳細的遊戲說明
+st.markdown('### 遊戲說明')
+st.markdown(
+    '''
+    你是冷酷機器人，啟動於復古 8-bit 界面。目標：
+    - 生存並在 100 分前不被摧毀
+    - 透過「探索、修復、休息、探測」累積分數並管理 HP
+    - 第7回合或特定行動序列可觸發隱藏彩蛋（可額外獲得分數）
+    - 背景顏色會隨場景與生命值動態改變，並有 Emoji 效果提示當前緊張度
+
+    操作方式：
+    1. 點擊行動按鈕執行回合
+    2. 觀察 AI 提示與狀態面板
+    3. 若失敗或勝利，可點擊「重新啟動遊戲」重置
+    '''
+)
+
 # Emoji 動畫效果 (簡易)
 emoji_options = ['⚡️', '🚀', '🔧', '💾', '🛡️']
 st.write(''.join([random.choice(emoji_options) for _ in range(8)]))
@@ -118,6 +135,19 @@ def check_status():
         end_game(False)
     elif st.session_state.score >= TARGET_SCORE:
         end_game(True)
+
+
+def reset_game():
+    st.session_state.hp = MAX_HP
+    st.session_state.score = 0
+    st.session_state.turn = 0
+    st.session_state.scene = '基地啟動'
+    st.session_state.easter_egg_found = False
+    st.session_state.last_actions = []
+    st.session_state.status_msg = '系統重置：開始新的生存挑戰。'
+    st.session_state.game_over = False
+    st.session_state.win = False
+    st.session_state.bgm = '正常'
 
 
 def update_easter_egg(action):
@@ -223,8 +253,7 @@ with colD:
     if st.button('探測'): action_scan()
 
 if st.button('重新啟動遊戲'):
-    st.session_state.initialized = False
-    st.experimental_rerun()
+    reset_game()
 
 # 遊戲結局顯示
 if st.session_state.game_over:
